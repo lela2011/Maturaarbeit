@@ -1,10 +1,10 @@
-import scipy.special as special
-import scipy.constants as const
-
 import numpy as np
+import scipy.constants as const
+import scipy.special as special
 
 
 def laguerre_polynomial_builder(r,s):
+
     def laguerre_polynomial_callback(x):
         L_rs = 0
         k=0
@@ -27,16 +27,19 @@ def radial_wave_function_builder(z: int, n: int, l: int):
     a = const.physical_constants["Bohr radius"][0]
     k = z / (n*a)
     laguerre_polynomial = laguerre_polynomial_builder(n+l, 2*l + 1)
+
     def radial_wave_function_callback(r):
         func = -1 * np.power((np.math.factorial(n-l-1)*np.power(2*k, 3)) / (2 * n * np.power(np.math.factorial(n+l), 3)), 1/2) * np.power(2*k*r, l) * np.exp(-1 * k * r) * laguerre_polynomial(2 * k * r)
         return func
 
     return radial_wave_function_callback
 
+
 def radial_wave_function_builder_eth(z, n, l):
     mu = const.electron_mass * const.proton_mass / (const.electron_mass + const.proton_mass)
     a = const.physical_constants["Bohr radius"][0]*const.electron_mass/mu
     laguerre_polynomial = special.genlaguerre(n-l-1, 2*l+1)
+
     def fun(r):
         val = np.sqrt((np.math.factorial(n-l-1))/(2*n*np.math.factorial(n+l))) * np.power((2*z)/(n*a), 3/2) * np.power((2*z*r)/(n*a),l) * np.exp((-z*r)/(n*a)) * laguerre_polynomial((2*z*r)/(n*a))
         return val

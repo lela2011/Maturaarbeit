@@ -1,14 +1,12 @@
-import Hydrogen_lib as hydlib
-
-import scipy.constants as const
-
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.constants as const
+
+import Hydrogen_lib as hydlib
 
 if __name__ == '__main__':
 
-    mu = const.electron_mass * const.proton_mass / (const.electron_mass + const.proton_mass)
-    a = const.physical_constants["Bohr radius"][0] * const.electron_mass / mu
+    a = const.physical_constants["Bohr radius"][0]
 
     # Input of values
     z = int(input("Ordnungszahl: "))
@@ -18,16 +16,16 @@ if __name__ == '__main__':
 
     k = z / (n * a)
 
-    x = np.linspace(0, 50, 500)
+    x = np.linspace(0, 50*a, 500)
     fig, axis = plt.subplots(1)
     radial_wave_function_3_0_eth = hydlib.radial_wave_function_builder_eth(z, n, l)
     radial_wave_function_3_0_schwabl = hydlib.radial_wave_function_builder(z, n, l)
-    axis.plot(x, radial_wave_function_3_0_eth(x*a) * np.power(a, 3/2), "r")
-    axis.plot(x, radial_wave_function_3_0_schwabl(x*a) * np.power(a, 3/2), "b")
-    axis.set_title("n: {}".format(n))
+    axis.plot(x, x**2 * radial_wave_function_3_0_eth(x)**2, "r")
+    axis.plot(x, x**2 * radial_wave_function_3_0_schwabl(x)**2, "b")
+    axis.set_title("n: {} l: {}".format(n, l))
 
-    axis.set_ylabel("R_nl(r)*a^(3/2)", loc="top")
-    axis.set_xlabel("r/a", loc="right")
+    axis.set_ylabel("R_nl(r)", loc="center")
+    axis.set_xlabel("r", loc="center")
 
     axis.spines['left'].set_position('zero')
     axis.spines['bottom'].set_position('zero')
