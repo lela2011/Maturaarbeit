@@ -22,11 +22,13 @@ if __name__ == '__main__':
 
         def next_l(self, event):
             self.l += 1
+            self.m = 0
             self.new_data()
 
         def prev_l(self, event):
-            if not self.l==0:
+            if not self.l == 0:
                 self.l -= 1
+                self.m = 0
                 self.new_data()
 
         def next_m(self, event):
@@ -41,10 +43,8 @@ if __name__ == '__main__':
 
         def new_data(self):
             global R, x, y, z, theta, phi, ax
-            if self.m == 0:
-                R = abs(spec.sph_harm(self.m, self.l, theta, phi).real)
-            else:
-                R = abs(spec.sph_harm(self.m, self.l, theta, phi).imag)
+
+            R = np.sqrt((spec.sph_harm(self.m, self.l, theta, phi)*np.conj(spec.sph_harm(self.m, self.l, theta, phi))).real)
 
             x = R * np.sin(phi) * np.cos(theta)
             y = R * np.sin(phi) * np.sin(theta)
