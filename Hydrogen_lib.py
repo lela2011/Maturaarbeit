@@ -1,3 +1,4 @@
+import numpy
 import numpy as np
 import scipy.constants as const
 import scipy.special as special
@@ -29,7 +30,7 @@ def spherical_harmonics_builder(l: int, m: int):
     return spherical_harmonic
 
 
-def radial_wave_function_builder(z: int, n: int, l: int):
+def radial_wave_function_builder(z: int, n: int, l: int, m1: float, m2: float):
     '''
     Creates callable wavefunction dependent on r.
 
@@ -39,13 +40,25 @@ def radial_wave_function_builder(z: int, n: int, l: int):
     :type n: int
     :param l: Azimuthal quantum number
     :type l: int
+    :param m1: Electron mass
+    :type m1: float
+    :param m2: Nucleus mass
+    :type m2: float
     :return: Radial wave function dependent on r
     :rtype: FunctionType
     '''
 
-    # Bohr radius
-    a = const.physical_constants["Bohr radius"][0]
-    k = z / (n*a)
+    # elementary charge
+    e_0 = const.elementary_charge
+    # Vacuum permittivity
+    epsilon_0 = const.epsilon_0
+    # reduced plank constant
+    hbar = const.hbar
+    # mu
+    mu = m1 * m2 / ( m1 + m2 )
+
+    k = (mu * e_0**2 * z) / ( 4 * numpy.pi * epsilon_0 * hbar ** 2 * n )
+
     # generalized laguerre polynomial
     laguerre_polynomial = special.genlaguerre(n-l-1, 2*l+1)
     # Normalisation constant A
@@ -65,29 +78,50 @@ def radial_wave_function_builder(z: int, n: int, l: int):
     return radial_wave_function
 
 
-def eva_coulomb_potential_electronVolt(z, n, mass_e, mass_p):
+def radial_wave_function_dim_builder(z: int, n: int, l: int, m1: float, m2: float):
     '''
-    Calculates the eigenvalues for the coulomb potential of a hydrogen Atom dependent on z, n, electron mass and proton mass
+    Creates callable wavefunction dependent on dimensionless r.
 
     :param z: Atomic number
     :type z: int
     :param n: Principle quantum number
     :type n: int
-    :param mass_e: Mass of electron
-    :type mass_e: float
-    :param mass_p: Mass of proton
-    :type mass_p: float
-    :return: Energy eigenvalue of hydrogen atom for given z, n, electron mass and proton mass in electron volts
-    :rtype: float
+    :param l: Azimuthal quantum number
+    :type l: int
+    :param m1: Mass of electron
+    :type m1: float
+    :param m2: Mass of nucleus
+    :type m2: float
+    :return: Radial wave function dependent on r
+    :rtype: FunctionType
     '''
 
     # reduced mass
-    mu = mass_e * mass_p / (mass_e + mass_p)
-    # Energieeigenwerte Coulomb-Potential in eV
-    return - (mu * const.c ** 2) / (2 * const.e) * const.alpha ** 2 * z ** 2 / n ** 2
+    mu = (m1*m2)/(m1+m2)
+    # electron mass
+    m_e = const.electron_mass
+
+    kappa = mu / m_e * z / n
+    # generalized laguerre polynomial
+    laguerre_polynomial = special.genlaguerre(n-l-1, 2*l+1)
+    # Normalisation constant A
+    norm_const = ( ( np.math.factorial(n-l-1) ) / ( 2 * n * ( np.math.factorial(n+l) ) ** 3 ) )**(1/2)
+
+    def radial_wave_function(r):
+        '''
+        Returns the value of the radial wave function dependent on r
+
+        :param r: distance to origin
+        :type r: float
+        :return: value of radial wave function
+        '''
+
+        return -1 * norm_const * (2*kappa) ** (3/2) * (2*kappa*r) ** l * np.e ** (-1*kappa*r) * laguerre_polynomial(2 * kappa * r)
+
+    return radial_wave_function
 
 
-def eva_coulomb_potential_joule(z, n, mass_e, mass_p):
+def eigenenergy(z, n, m1, m2):
     '''
     Calculates the eigenvalues for the coulomb potential of a hydrogen Atom dependent on z, n, electron mass and proton mass
 
@@ -95,15 +129,51 @@ def eva_coulomb_potential_joule(z, n, mass_e, mass_p):
     :type z: int
     :param n: Principle quantum number
     :type n: int
-    :param mass_e: Mass of electron
-    :type mass_e: float
-    :param mass_p: Mass of proton
-    :type mass_p: float
+    :param m1: Mass of electron
+    :type m1: float
+    :param m2: Mass of nucleus
+    :type m2: float
     :return: Energy eigenvalue of hydrogen atom for given z, n, electron mass and proton mass in joules
     :rtype: float
     '''
 
     # reduced mass
-    mu = mass_e * mass_p / (mass_e + mass_p)
-    # eigenvalues coulomb potential in joules
-    return - mu * const.c ** 2 / 2 * const.alpha ** 2 * z ** 2 / n ** 2
+    mu = m1 * m2 / (m1 + m2)
+    # reduced plank constatn
+    hbar = const.hbar
+    # elementary charge
+    e_0 = const.elementary_charge
+    # Vacuum permittivity
+    epsilon_0 = const.epsilon_0
+
+    E_n = - 1/2 * (mu * e_0**4)/( (4*np.pi*epsilon_0)**2 * hbar ** 2 ) * z**2 / (n**2)
+
+    # Eigenenergy for electron for given Z and n
+    return E_n
+
+
+def eigenenergy_dim(z, n, m1, m2):
+    '''
+    Calculates the eigenvalues for the coulomb potential of a hydrogen Atom dependent on z, n, electron mass and proton mass
+
+    :param z: Atomic number
+    :type z: int
+    :param n: Principle quantum number
+    :type n: int
+    :param m1: Mass of electron
+    :type m1: float
+    :param m2: Mass of nucleus
+    :type m2: float
+    :return: Energy eigenvalue of hydrogen atom for given z, n, electron mass and proton mass in joules
+    :rtype: float
+    '''
+
+    # reduced mass
+    mu = m1 * m2 / (m1 + m2)
+    # electron mass
+    m_e = const.electron_mass
+
+    E_n = - mu / m_e * z**2 / (n**2)
+
+    # Eigenenergy for electron for given Z and n
+    return E_n
