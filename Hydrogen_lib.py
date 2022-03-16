@@ -30,6 +30,31 @@ def spherical_harmonics_builder(l: int, m: int):
     return spherical_harmonic
 
 
+def laguerre_polynomial_builder(n: int, m: int):
+    '''
+    Creates callable Laguerre-polynomial for given n and m
+
+    :param n: parameter 1
+    :type n: int
+    :param m: parameter 2
+    :type m: int
+    :return: Laguerre Polynomial dependent on x
+    :rtype: FunctionType
+    '''
+    def laguerre_polynomial(x: float):
+        # Start values
+        L = 0
+        j = 0
+        # Sum
+        while j <= (n-m):
+            L = L + (-1)**(j+m) * np.math.factorial(n)**2 / (np.math.factorial(j) * np.math.factorial(j+m) * np.math.factorial(n-j-m)) * x**j
+            j += 1
+
+        return L
+
+    return laguerre_polynomial
+
+
 def radial_wave_function_builder(z: int, n: int, l: int, m1: float, m2: float):
     '''
     Creates callable wavefunction dependent on r.
@@ -60,7 +85,7 @@ def radial_wave_function_builder(z: int, n: int, l: int, m1: float, m2: float):
     k = (mu * e_0**2 * z) / ( 4 * numpy.pi * epsilon_0 * hbar ** 2 * n )
 
     # generalized laguerre polynomial
-    laguerre_polynomial = special.genlaguerre(n-l-1, 2*l+1)
+    laguerre_polynomial = laguerre_polynomial_builder(n+l, 2*l+1)
     # Normalisation constant A
     norm_const = ((np.math.factorial(n - l - 1) * (2 * k) ** 3) / (2 * n * (np.math.factorial(n + l)) ** 3)) ** (1 / 2)
 
@@ -101,9 +126,9 @@ def radial_wave_function_dim_builder(z: int, n: int, l: int, m1: float, m2: floa
     # electron mass
     m_e = const.electron_mass
 
-    kappa = mu / m_e * z / n
+    kappa = (mu * z) / (m_e * n)
     # generalized laguerre polynomial
-    laguerre_polynomial = special.genlaguerre(n-l-1, 2*l+1)
+    laguerre_polynomial = laguerre_polynomial_builder(n + l, 2 * l + 1)
     # Normalisation constant A
     norm_const = ( ( np.math.factorial(n-l-1) ) / ( 2 * n * ( np.math.factorial(n+l) ) ** 3 ) )**(1/2)
 
