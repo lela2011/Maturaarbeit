@@ -19,14 +19,14 @@ def spherical_harmonics_builder(l: int, m: int):
         '''
         Spherical harmonic dependent on quantum numbers l and m.
 
-        :param theta: azimuthal angle in spherical coordinate system, 0 ≤ theta ≤ π
+        :param theta: polar angle in spherical coordinate system, 0 ≤ theta ≤ π
         :type theta: float
-        :param phi: polar angle in spherical coordinate system, 0 ≤ phi < 2π
+        :param phi: azimuthal angle in spherical coordinate system, 0 ≤ phi < 2π
         :type phi: float
         :return: Complex number
         :rtype: complex
         '''
-        return special.sph_harm(m, l, theta, phi)
+        return special.sph_harm(m, l, phi, theta)
     return spherical_harmonic
 
 

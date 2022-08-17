@@ -3,7 +3,7 @@ import numpy as np
 import scipy.constants as const
 import scipy.integrate
 
-import Hydrogen_lib as hydlib
+from Hydrogen import Hydrogen_lib as hydlib
 
 
 def plotR_nl(z, n, l, m1, m2):
