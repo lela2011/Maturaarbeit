@@ -1,10 +1,17 @@
 import numpy as np
-from scipy.special import comb, factorial2
-
-from HartreeFock.BasisSets import BasisFunction
-
 
 class Overlap:
-    def __init__(self, basis_functions):
-        self.matrix = self._build_matrix(basis_functions)
+    '''Object that stores the overlap matrix
+    '''
 
+    def __init__(self, matrix: np.ndarray) -> None:
+        '''Creates an instance of the Overlap object 
+
+        Parameters
+        ----------
+        matrix : np.ndarray
+            Overlap integrals provided py pyscf in the form of a :math:`n^2` matrix
+        '''
+
+        # Overlap Matrix
+        self.matrix : np.ndarray = matrix
