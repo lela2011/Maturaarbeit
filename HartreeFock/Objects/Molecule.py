@@ -1,6 +1,6 @@
 from typing import List
 
-from HartreeFock.Objects.Atom import Atom
+from .Atom import Atom
 
 
 class Molecule:

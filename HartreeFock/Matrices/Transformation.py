@@ -1,8 +1,6 @@
 import imp
 import numpy as np
 
-from Matrices.Overlap import Overlap
-
 class Transformation:
     '''Object that stores the transformation matrix used for symmetric diagonalization
     '''
