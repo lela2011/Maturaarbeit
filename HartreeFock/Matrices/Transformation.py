@@ -7,19 +7,19 @@ class Transformation:
     '''Object that stores the transformation matrix used for symmetric diagonalization
     '''
 
-    def __init__(self, overlap: Overlap) -> None:
+    def __init__(self, overlap: np.ndarray) -> None:
         '''Creates an instance of the Transformation object 
 
         Parameters
         ----------
-        matrix : Overlap
+        matrix : np.ndarray
             Overlap matrix calculated from overlap integrals
         '''
 
         # Find eigenvalues and eigenvectors of the overlap matrix.
         # Eigenvalues are returned as a 1-D array. 
         # Eigenvectors are returned as a 2-D array (matrix) where each column resembles one eigenvector
-        eigen_val, vector_matrix = np.linalg.eigh(overlap.matrix)
+        eigen_val, vector_matrix = np.linalg.eigh(overlap)
 
         # Generates a diagonal matrix constructed form the inverse square roots of the overlap matrix' eigenvalues
         diagonal_matrix = np.diag(eigen_val ** -0.5)
