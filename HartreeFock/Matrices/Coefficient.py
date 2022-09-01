@@ -18,8 +18,8 @@ class Coefficient:
         # Checks if this is the initial guess
         # if yes -> creates a 2-D square matrix with zeors or random matrix between -100 and 100 as the initial guess
         if old_matrix == []:
-            # self.matrix : np.ndarray = np.zeros((function_num, function_num))
-            self.matrix :np.ndarray = np.random.uniform(low=-100, high=100, size=(function_num, function_num))
+            self.matrix : np.ndarray = np.zeros((function_num, function_num))
+            # self.matrix :np.ndarray = np.random.uniform(low=-100, high=100, size=(function_num, function_num))
             
         # if no -> stores the result of the last calucaltion in the new matrix
         else:

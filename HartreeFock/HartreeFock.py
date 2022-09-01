@@ -1,6 +1,7 @@
 from operator import truediv
-from pyscf import gto
+from pyscf import gto, scf
 import numpy as np
+from Matrices.Density import Density
 
 from Matrices.Transformation import Transformation
 from Matrices.Core import Core
@@ -13,17 +14,13 @@ from Objects.Molecule import Molecule
 if __name__ == "__main__":
 
     # Define Atoms
-    f = Atom("F", (0.0, 0.0, 0.0))
-    h = Atom("H", (0.0, 0.0, 1.73))
-
-    # Define Molecule
-    molecule = Molecule([f, h])
+    he = Atom("He", (0.0, 0.0, 0.0))
 
     # Generate pyscf string to build pyscf molecule
-    pyscf_name = molecule.pyscf_molecule_string()
+    pyscf_name = he.pyscf_atom_name()
 
     # Build pyscf molecule
-    mol = gto.M(atom = pyscf_name, basis="STO-3G")
+    mol = gto.M(atom = pyscf_name, basis="STO-3G", unit="Bohr")
 
     # Generate integrals used for caluclations
     s = mol.intor("int1e_ovlp", hermi=1)
@@ -49,11 +46,23 @@ if __name__ == "__main__":
     # set variable used to check for convergence
     converges = False
 
+    # Test integrals
+    #mf = scf.hf.SCF(mol)
+
+    #generated_s = mf.get_ovlp()
+    #generated_core = mf.get_hcore()
+
     # iterate until energies converge
     while not converges:
         
+        density = Density(mol.nao, last_coefficient.matrix)
+
         # generate Fock matrix
-        fock = Fock(core, last_coefficient, ERIs)
+        fock = Fock(core, density, ERIs)
+
+        #veff = fock.matrix - core.matrix
+        #generated_veff = scf.hf.get_veff(mol, density.matrix)
+        #generated_fock = scf.hf.get_fock(mol, dm = density.matrix)
 
         # transform Fock matrix
         transformed_fock = np.linalg.multi_dot([transformation.matrix.transpose(), fock.matrix, transformation.matrix])
