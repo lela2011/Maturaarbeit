@@ -6,7 +6,7 @@ from Matrices.Core import Core
 from Matrices.Fock import Fock
 import numpy as np
 
-mol = gto.M(atom="Ne 0 0 0", basis="STO-3G", unit="Bohr")
+mol = gto.M(atom="H 0 0 0; F 0 0 1.73", basis="STO-3G", unit="Bohr")
 mol.verbose = 0
 
 rhf = scf.RHF(mol)
