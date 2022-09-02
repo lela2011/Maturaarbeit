@@ -13,11 +13,15 @@ from Objects.Molecule import Molecule
 
 if __name__ == "__main__":
 
-    # Define Atoms
-    he = Atom("He", (0.0, 0.0, 0.0))
+    # Define atoms
+    h = Atom("H", (0.0, 0.0, 0.0))
+    f = Atom("F", (0.0, 0.0, 1.73))
+
+    # Define molecule
+    HF_mol = Molecule([h, f], [2, 2, 2, 2, 2, 0])
 
     # Generate pyscf string to build pyscf molecule
-    pyscf_name = he.pyscf_atom_name()
+    pyscf_name = HF_mol.pyscf_molecule_string()
 
     # Build pyscf molecule
     mol = gto.M(atom = pyscf_name, basis="STO-3G", unit="Bohr")
@@ -37,25 +41,16 @@ if __name__ == "__main__":
     # Initial Guess
     last_coefficient = Coefficient(mol.nao)
 
-    # Print initial guess to check if algorithm is messing up somewhere
-    print("Initial guess: {}\n----------------------------".format(last_coefficient.matrix))
-
     # Set energy to "unreachable" value for first iteration so convergence check is not triggered
     last_energy : float = 1000
 
     # set variable used to check for convergence
     converges = False
 
-    # Test integrals
-    #mf = scf.hf.SCF(mol)
-
-    #generated_s = mf.get_ovlp()
-    #generated_core = mf.get_hcore()
-
     # iterate until energies converge
     while not converges:
         
-        density = Density(mol.nao, last_coefficient.matrix)
+        density = Density(mol.nao, last_coefficient.matrix, HF_mol.shell_occupancy)
 
         # generate Fock matrix
         fock = Fock(core, density, ERIs)
@@ -91,7 +86,7 @@ if __name__ == "__main__":
         last_coefficient = Coefficient(mol.nao, old_matrix = coefficient)
 
         # check for convergence
-        if 0 <= energy_diff <= 0.0001:
+        if 0 <= energy_diff <= 10e-14:
             converges = True
 
     #print found energies

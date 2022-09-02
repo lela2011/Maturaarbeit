@@ -4,7 +4,7 @@ class Density:
     '''Object that stores the density matrix
     '''
 
-    def __init__(self, function_num : int, old_matrix : np.ndarray = []) -> None:
+    def __init__(self, function_num : int, old_matrix : np.ndarray = [], shell_occupancy : np.ndarray = []) -> None:
         '''Creates an instance of the density object
 
         Parameters
@@ -13,6 +13,8 @@ class Density:
             amount of basis functions used to describe the molecule
         old_matrix : np.ndarray, optional
             coefficient matrix as the result of the previous iteration. Leave empty if it's the initial guess
+        shell_occupancy : np.ndarray
+            list that holds the amount of electrons that are present in each shell
         '''
 
         # Checks if this is the initial guess
@@ -22,15 +24,17 @@ class Density:
             
         # if no -> stores the result of the last calucaltion in the new matrix
         else:
-            self.matrix : np.ndarray = self._build_density_matrix(old_matrix)
+            self.matrix : np.ndarray = self._build_density_matrix(old_matrix, shell_occupancy)
 
-    def _build_density_matrix(self, old_matrix: np.ndarray):
+    def _build_density_matrix(self, old_matrix: np.ndarray, shell_occupancy: np.ndarray):
         '''Calculates the density matrix
 
         Parameters
         ----------
         old_matrix : np.ndarray
             last coefficient matrix
+        shell_occupancy : np.ndarray
+            list that holds the amount of electrons that are present in each shell
 
         Returns
         -------
@@ -51,11 +55,11 @@ class Density:
                 # Select all coefficients for the l-th basis function
                 row_k = old_matrix[k]
 
-                # Element wise multiplication of all the coefficients
-                product_array = np.multiply(row_i, row_k)
+                # Element wise multiplication of all the coefficients and shell_occupancy
+                product_array = np.multiply(shell_occupancy, np.multiply(row_i, row_k))
 
                 # Sum all products and multiply by 2 to generate a density matrix element
-                density_matrix_element = 2 * np.sum(product_array)
+                density_matrix_element = np.sum(product_array)
 
                 # store calculated value in matrix
                 matrix[i, k] = density_matrix_element

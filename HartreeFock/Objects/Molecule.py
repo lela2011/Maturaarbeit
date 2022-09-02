@@ -1,29 +1,31 @@
 from typing import List
 
 from .Atom import Atom
+import numpy as np
 
 
 class Molecule:
     '''Object that holds all the necessary infromation of the molecule that is to be calculated
     '''
 
-    def __init__(self, atoms : List[Atom] = []):
+    def __init__(self, atoms : np.ndarray, shell_occupancy: np.ndarray):
         '''Generates instance of a Molecule
 
         Parameters
         ----------
-        atoms : list, optional
+        atoms : np.ndarray, optional
             list of Atoms that make up the Molecule, by default []
         '''
 
         self.atoms = atoms
+        self.shell_occupancy = shell_occupancy
 
-    def add_atoms(self, atoms: List[Atom]):
+    def add_atoms(self, atoms: np.ndarray):
         '''adds atoms to the molecule after instance of Molecule has been initialized
 
         Parameters
         ----------
-        atoms : List[Atom]
+        atoms : np.ndarray
             List of atoms that make up the Molecule, by default []
         '''
         self.atoms.append(atoms)
