@@ -15,6 +15,8 @@ class Molecule:
         ----------
         atoms : np.ndarray, optional
             list of Atoms that make up the Molecule, by default []
+        shell_occupancy: np.ndarray
+            list of molecular orbitals that are occupied. The value denots how many electrons are in the orbital
         '''
 
         self.atoms = atoms
@@ -30,7 +32,7 @@ class Molecule:
         '''
         self.atoms.append(atoms)
 
-    def pyscf_molecule_string(self) -> str:
+    def pyscf_name(self) -> str:
         '''Generates string that describes molecule to be passed in pyscf's Mole object
 
         Returns
@@ -40,7 +42,7 @@ class Molecule:
         '''
 
         # Create list of pyscf atom names
-        pyscf_atom_strings = [atom.pyscf_atom_name() for atom in self.atoms]
+        pyscf_atom_strings = [atom.pyscf_name() for atom in self.atoms]
 
         # Combine strings into one string separated by "; "
         pyscf_molecule_string = "; ".join(pyscf_atom_strings)

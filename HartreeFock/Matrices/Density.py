@@ -4,17 +4,17 @@ class Density:
     '''Object that stores the density matrix
     '''
 
-    def __init__(self, function_num : int, old_matrix : np.ndarray = [], shell_occupancy : np.ndarray = []) -> None:
+    def __init__(self, function_num : int, shell_occupancy : np.ndarray, old_matrix : np.ndarray = []) -> None:
         '''Creates an instance of the density object
 
         Parameters
         ----------
         function_num : int
             amount of basis functions used to describe the molecule
-        old_matrix : np.ndarray, optional
-            coefficient matrix as the result of the previous iteration. Leave empty if it's the initial guess
         shell_occupancy : np.ndarray
             list that holds the amount of electrons that are present in each shell
+        old_matrix : np.ndarray, optional
+            coefficient matrix as the result of the previous iteration. Leave empty if it's the initial guess
         '''
 
         # Checks if this is the initial guess
@@ -48,6 +48,10 @@ class Density:
         # generate empty matrix to store values in later
         matrix = np.zeros((i_range, k_range))
 
+        # if no shell occupancy defined generate it for atom
+        if shell_occupancy == [] :
+            shell_occupancy = np.full(old_matrix.shape, 2)
+
         for i in range(i_range):
             for k in range(k_range):
                 # Select all coefficients for the j-th basis function
@@ -62,6 +66,6 @@ class Density:
                 density_matrix_element = np.sum(product_array)
 
                 # store calculated value in matrix
-                matrix[i, k] = density_matrix_element
+                matrix[i, k] = density_matrix_element.real
 
         return matrix

@@ -5,7 +5,7 @@ class Atom:
     '''Object that stores all the necessary information about an Atom
     '''
 
-    def __init__(self, element: str, position: Tuple[float, float, float]):
+    def __init__(self, element: str, position: Tuple[float, float, float], core_charge: int):
         '''Creates an instance of an atom used for HartreeFock calculations
 
         Parameters
@@ -14,10 +14,13 @@ class Atom:
             Atomic symbol of atom, PySCF will use this information to generate the basis functions
         position : Tuple[float, float, float]
             Position of the nucleus in vector space in the form (x, y, z). Lengths are given in Bohr-radii
+        core_charge: int
+            Charge of the atom
         '''
 
         self.element = element
         self.position = position
+        self.core_charge = core_charge
 
     def x(self) -> float:
         '''Cartesian coordinate x
@@ -52,7 +55,7 @@ class Atom:
 
         return self.position[2]
 
-    def pyscf_atom_name(self) -> str:
+    def pyscf_name(self) -> str:
         '''Returns the string used in pyscf's Mole object atom attribute
 
         Returns

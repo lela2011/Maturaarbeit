@@ -1,94 +1,55 @@
-from operator import truediv
-from pyscf import gto, scf
 import numpy as np
-from Matrices.Density import Density
-
-from Matrices.Transformation import Transformation
-from Matrices.Core import Core
-from Matrices.Coefficient import Coefficient
-from Matrices.Fock import Fock
 
 from Objects.Atom import Atom
 from Objects.Molecule import Molecule
 
+from RHF import RHF
+
+import matplotlib.pyplot as plt
+
 if __name__ == "__main__":
 
-    # Define atoms
-    h = Atom("H", (0.0, 0.0, 0.0))
-    f = Atom("F", (0.0, 0.0, 1.73))
+    # Define carbon atom
+    c = Atom("C", (0.0, 0.0, 0.0), 6)
 
-    # Define molecule
-    HF_mol = Molecule([h, f], [2, 2, 2, 2, 2, 0])
+    # Define array that stores energy based on bond length
+    energies_core_co2 = []
 
-    # Generate pyscf string to build pyscf molecule
-    pyscf_name = HF_mol.pyscf_molecule_string()
+    # Generate array that holds bond lengths that are to be calculated
+    x = np.arange(0.5,3, 0.05)
 
-    # Build pyscf molecule
-    mol = gto.M(atom = pyscf_name, basis="STO-3G", unit="Bohr")
+    # keep track of progress
+    i = 1
 
-    # Generate integrals used for caluclations
-    s = mol.intor("int1e_ovlp", hermi=1)
-    kin = mol.intor("int1e_kin", hermi=1)
-    nuc = mol.intor("int1e_nuc", hermi=1)
-    ERIs = mol.intor("int2e")
+    # loop over bond lengths
+    for pos in x:
 
-    # Calculate transformation matrix based on overlap matrix
-    transformation = Transformation(s)
+        # Define oxygen atoms
+        o_1 = Atom("O", (0.0, 0.0, -pos), 8)
+        o_2 = Atom("O", (0.0, 0.0, pos), 8)
 
-    # Generate Core-Hamiltonian based on kinetic integrals and nuclear attraction integrals
-    core = Core(kin, nuc)
+        # Define molecule
+        co_2_mol = Molecule([o_1, c, o_2], [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0])
 
-    # Initial Guess
-    last_coefficient = Coefficient(mol.nao)
+        # define RHF calculation
+        rhf_co_2 = RHF(co_2_mol)
 
-    # Set energy to "unreachable" value for first iteration so convergence check is not triggered
-    last_energy : float = 1000
+        # run SCF algorithm
+        results_co2 = rhf_co_2.calculate()
 
-    # set variable used to check for convergence
-    converges = False
+        # stores returned values in variables
+        energy_co2 = results_co2[0]
+        iterations_co2 = results_co2[3]
+        energies_core_co2.append(energy_co2)
 
-    # iterate until energies converge
-    while not converges:
-        
-        density = Density(mol.nao, last_coefficient.matrix, HF_mol.shell_occupancy)
+        # prints progress
+        print("----------")
+        print("CO_2 --- {} of {} done --- Energy: {:.2f} with Iterations: {}".format(i, len(x), energy_co2, iterations_co2))
+        print("----------\n")
 
-        # generate Fock matrix
-        fock = Fock(core, density, ERIs)
+        # updates iteration counter
+        i += 1
 
-        #veff = fock.matrix - core.matrix
-        #generated_veff = scf.hf.get_veff(mol, density.matrix)
-        #generated_fock = scf.hf.get_fock(mol, dm = density.matrix)
-
-        # transform Fock matrix
-        transformed_fock = np.linalg.multi_dot([transformation.matrix.transpose(), fock.matrix, transformation.matrix])
-
-        # diagonalize tranformed Fock matrix to find eigenenergy and eigenvectors
-        eigen_energy, transformed_eigen_vec = np.linalg.eig(transformed_fock)
-
-        # order eigenenergies and corresponding eigenvectors
-        idx = eigen_energy.argsort()
-        eigen_energy = eigen_energy[idx]
-        transformed_eigen_vec = transformed_eigen_vec[:,idx]
-
-        # transform coefficients to untransformed state
-        coefficient = np.dot(transformation.matrix, transformed_eigen_vec)
-
-        # sum energy to be used to check convergence
-        energy = np.sum(eigen_energy)
-
-        # calculate energy difference
-        energy_diff = energy - last_energy
-
-        # store energy for next iteration
-        last_energy = energy
-
-        # generate new coefficient matrix
-        last_coefficient = Coefficient(mol.nao, old_matrix = coefficient)
-
-        # check for convergence
-        if 0 <= energy_diff <= 10e-14:
-            converges = True
-
-    #print found energies
-    print(eigen_energy)
-
+    # plots graph
+    plt.plot(x, energies_core_co2,'g-')
+    plt.show()
