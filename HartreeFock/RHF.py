@@ -16,16 +16,19 @@ class RHF():
     '''
 
 
-    def __init__(self, particle) -> None:
+    def __init__(self, particle, max_iterations = 1000) -> None:
         '''Generates RHF object for molecule or atom
 
         Parameters
         ----------
         particle : Atom or Molecule
             Molecule or atom that should be calculated
+        max_iterations: int
+            Maximum amount of iterations after which the algorithm calls for non convergence, default 1000
         '''
 
         self.particle = particle
+        self.max_iterations = max_iterations
 
     def calculate(self) -> Tuple:
         '''Generates all necessary integrals and runs the SCF Algorithm until values converge
@@ -69,8 +72,8 @@ class RHF():
         # keep track of iterations
         iterations = 1
 
-        # iterate until energies converge
-        while not converges:
+        # iterate until energies converge or maximum amount of iterations is reached
+        while not converges or iterations > self.max_iterations:
             
             # generate density matrix
             density = Density(mol.nao, shell_occupancy, last_coefficient.matrix)
