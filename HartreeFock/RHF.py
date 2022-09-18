@@ -36,7 +36,7 @@ class RHF():
         Returns
         -------
         Tuple
-            tuple of total energy, orbital energy, final expansion coefficients and the amount of iterations necessary
+            tuple of total energy, orbital energy, final expansion coefficients, the amount of iterations necessary and whether the energy converged
         '''
 
         # generates PySCF molecule to be later used in integral generation
@@ -151,4 +151,4 @@ class RHF():
         e_tot = V_eff + electron_energy
 
         # return total energy, orbital energy, final expansion coefficients and the amount of iterations
-        return (e_tot, eigen_energy, last_coefficient, iterations)
+        return (e_tot, eigen_energy, last_coefficient, iterations, converges)
